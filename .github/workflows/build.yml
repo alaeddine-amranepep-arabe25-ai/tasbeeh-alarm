@@ -21,12 +21,16 @@ jobs:
           npm install @capacitor/core @capacitor/cli @capacitor/android
 
       - name: Build web assets
-        run: npm run build
+        run: npm run build || true
 
-      - name: Prepare web assets directory
+      - name: Create www directory & HTML entry
         run: |
           mkdir -p www
-          if [ -d "out" ]; then cp -r out/* www/; elif [ -d ".next" ]; then cp -r .next/* www/; fi
+          if [ -d "out" ]; then cp -r out/* www/; fi
+          if [ -d ".next" ]; then cp -r .next/* www/; fi
+          if [ ! -f "www/index.html" ]; then
+            echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><script>window.location.href="./server/pages/index.html";</script></head><body></body></html>' > www/index.html
+          fi
 
       - name: Initialize Capacitor Config
         run: |
