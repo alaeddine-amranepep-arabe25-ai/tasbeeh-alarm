@@ -19,12 +19,12 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Install dependencies
         run: |
           npm install
-          npm install @capacitor/core@latest @capacitor/cli@latest @capacitor/android@latest
+          npm install @capacitor/core @capacitor/cli @capacitor/android
 
       - name: Build web assets
         run: npm run build || true
@@ -59,7 +59,6 @@ jobs:
         run: |
           echo "android.enableJetifier=true" >> android/gradle.properties
           echo "android.useAndroidX=true" >> android/gradle.properties
-          echo "android.dependencyResolutionManagement.ignoreRules=true" >> android/gradle.properties || true
 
       - name: Build APK
         run: |
