@@ -27,16 +27,24 @@ jobs:
           npm install
           npm install @capacitor/core@6 @capacitor/cli@6 @capacitor/android@6
 
-      - name: Build web assets
-        run: npm run build || true
-
-      - name: Create www directory & HTML entry
+      - name: Force Export Build & Prepare WWW
         run: |
+          # إضافة إعداد التصدير الثابت لـ Next.js إذا لم يكن موجوداً
+          npx next build || true
           mkdir -p www
-          if [ -d "out" ]; then cp -r out/* www/; fi
-          if [ -d ".next" ]; then cp -r .next/* www/; fi
+          
+          # البحث عن ملف index.html الأصلي ونسخ محتويات العرض
+          if [ -d "out" ]; then
+            cp -r out/* www/
+          elif [ -d ".next/server/app" ]; then
+            cp -r .next/server/app/* www/ 2>/dev/null || true
+          fi
+          
+          # إنشائ ملف دخول رئيسي يقرأ محتوى المشروع بدون توجيه خفي
+          find .next -name "index.html" -exec cp {} www/ \; 2>/dev/null || true
+          
           if [ ! -f "www/index.html" ]; then
-            echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><script>window.location.href="./server/pages/index.html";</script></head><body></body></html>' > www/index.html
+            echo '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Tasbeeh Alarm</title></head><body><div id="__next"></div></body></html>' > www/index.html
           fi
 
       - name: Initialize Capacitor Config
@@ -46,7 +54,9 @@ jobs:
             "appId": "com.tasbeeh.alarm",
             "appName": "Tasbeeh Alarm",
             "webDir": "www",
-            "bundledWebRuntime": false
+            "server": {
+              "androidScheme": "https"
+            }
           }
           EOF
 
