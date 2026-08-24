@@ -23,6 +23,12 @@ jobs:
       - name: Build web assets
         run: npm run build
 
+      - name: Prepare webDir for Capacitor
+        run: |
+          mkdir -p www
+          if [ -d "out" ]; then cp -r out/* www/; elif [ -d ".next" ]; then cp -r .next/* www/; fi
+          touch www/index.html
+
       - name: Add Android
         run: npx @capacitor/cli add android || true
 
